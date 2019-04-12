@@ -1,20 +1,26 @@
+function powerline_precmd() {
+    PS1="$(powerline-shell --shell zsh $?)"
+}
+
+function install_powerline_precmd() {
+  for s in "${precmd_functions[@]}"; do
+    if [ "$s" = "powerline_precmd" ]; then
+      return
+    fi
+  done
+  precmd_functions+=(powerline_precmd)
+}
+
+if [ "$TERM" != "linux" ]; then
+    install_powerline_precmd
+fi
+
 # If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-  export ZSH="/home/ankurrajdev/.oh-my-zsh"
+export ZSH=$HOME/.oh-my-zsh
 
-# Set name of the theme to load. Optionally, if you set this to "random"
-# it'll load a random theme each time that oh-my-zsh is loaded.
-# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-ZSH_THEME="agnoster"
-
-# Set list of themes to load
-# Setting this variable when ZSH_THEME=random
-# cause zsh load theme from this variable instead of
-# looking in ~/.oh-my-zsh/themes/
-# An empty array have no effect
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -23,6 +29,10 @@ ZSH_THEME="agnoster"
 # sensitive completion must be off. _ and - will be interchangeable.
 # HYPHEN_INSENSITIVE="true"
 
+# Set name of the theme to load. Optionally, if you set this to "random"
+# it'll load a random theme each time that oh-my-zsh is loaded.
+# See https://github.com/agnoster/oh-my-zsh/wiki/Themes
+ZSH_THEME="agnoster"
 # Uncomment the following line to disable bi-weekly auto-update checks.
 # DISABLE_AUTO_UPDATE="true"
 
@@ -48,10 +58,7 @@ ZSH_THEME="agnoster"
 
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
+# The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 # HIST_STAMPS="mm/dd/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
@@ -61,9 +68,7 @@ ZSH_THEME="agnoster"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(
-  git
-)
+plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -95,37 +100,50 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init -)"
-fi
-eval "$(pyenv virtualenv-init -)"
-
-
-alias update='sudo apt-get update && sudo apt-get upgrade && sudo apt-get dist-upgrade'
+alias ll='ls -alh'
+alias la='ls -A'
+alias l='ls -CFlh'
+alias lsd="ls -alF | grep /$"
+alias update="sudo apt-get update && sudo apt-get upgrade && sudo apt-get dist-upgrade"
 alias gs="git status"
 alias ga="git add"
+alias gc="git checkout"
 alias gcm="git commit -m"
 alias gcam="git commit -am"
-alias gc="git checkout"
 alias gcb="git checkout -b"
 alias gl="git log --oneline --graph --decorate"
 alias tmux="tmux -2"
 alias vi="nvim"
 
-function _update_ps1() {
-    PS1=$(powerline-shell $?)
-}
+# setup virtualenvwrapper
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+export WORKON_HOME=~/.virtualenvs
+export PIP_VIRTUALENV_BASE=~/.virtualenvs
 
-if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
-    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
-fi
+setopt completealiases
+
+# required by pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+
+# required by pyenv-virtualenv
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+# required by fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# required by golang
+export GOPATH=$HOME/git/go
+export PATH=$PATH:$GOPATH
+export GOROOT=/usr/lib/go
+export PATH=$PATH:$GOROOT/bin
+export GOBIN=$GOPATH/bin
+
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/home/ankurrajdev/google-cloud-sdk/path.zsh.inc' ]; then source '/home/ankurrajdev/google-cloud-sdk/path.zsh.inc'; fi
+if [ -f '/home/ankurrajdev/google-cloud-sdk/path.zsh.inc' ]; then . '/home/ankurrajdev/google-cloud-sdk/path.zsh.inc'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '/home/ankurrajdev/google-cloud-sdk/completion.zsh.inc' ]; then source '/home/ankurrajdev/google-cloud-sdk/completion.zsh.inc'; fi
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+if [ -f '/home/ankurrajdev/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/ankurrajdev/google-cloud-sdk/completion.zsh.inc'; fi
